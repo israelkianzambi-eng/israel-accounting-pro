@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Israel Accounting Pro | V230.6</title>
+    <style>
+        :root { --bg: #050505; --panel: #111114; --text: #f0f0f2; --accent: #ffb800; --gold: #d4af37; --border: #2d2d33; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; height: 100vh; display: flex; overflow: hidden; }
+        
+        /* LEFT SIDEBAR: FULL DENSITY */
+        #left-sidebar { width: 25%; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100vh; }
+        #brand-header { padding: 25px 15px; background: var(--gold); color: #000; font-weight: 900; font-size: 1.2em; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        #hint-top { background: #1e293b; color: var(--accent); padding: 18px; font-size: 0.85em; font-weight: 800; border-bottom: 3px solid var(--accent); line-height: 1.5; }
+        .silo-container { padding: 20px; overflow-y: auto; flex-grow: 1; }
+        .silo-group { margin-bottom: 25px; border-left: 3px solid var(--gold); padding-left: 12px; }
+        .silo-title { color: var(--accent); font-size: 0.75em; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .silo-list { font-size: 0.75em; color: #cbd5e1; line-height: 1.8; }
+
+        /* CENTER: WORKSTATION */
+        #center-stage { width: 50%; padding: 30px; overflow-y: auto; background: var(--bg); height: 100vh; }
+        .work-card { background: #ffffff; color: #1a1a1c; padding: 30px; border-radius: 8px; border-top: 12px solid var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        textarea { width: 100%; padding: 15px; border: 2px solid #cbd5e1; border-radius: 6px; margin-bottom: 15px; font-family: inherit; font-size: 1em; box-sizing: border-box; background: #f8fafc; }
+        
+        #mission-display { background: #f1f5f9; border-left: 6px solid #0f172a; padding: 20px; margin-bottom: 20px; font-weight: 700; color: #1e293b; font-size: 0.95em; white-space: pre-line; line-height: 1.6; }
+        .journal-grid { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
+        th { font-size: 0.7em; color: #64748b; text-align: left; padding: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        select, input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; font-size: 0.85em; border-radius: 4px; background: #fff; color: #000; font-weight: 600; }
+        
+        .btn { width: 100%; padding: 18px; font-weight: 900; border: none; border-radius: 5px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
+        .btn-gen { background: var(--accent); color: #000; margin-bottom: 15px; }
+        .btn-gen:hover { background: #e6a700; }
+        .btn-val { background: #1a1a1c; color: #fff; margin-top: 25px; }
+        .btn-val:hover { background: #000; }
+        
+        #feedback { display: none; margin-top: 20px; padding: 18px; font-size: 0.9em; border-radius: 6px; border: 2px solid; font-weight: 800; line-height: 1.5; }
+        .red { background: #fff1f2; color: #991b1b; border-color: #fca5a5; }
+        .green { background: #f0fdf4; color: #166534; border-color: #86efac; }
+
+        /* RIGHT SIDEBAR: DRAG SLIDE DICTIONARY */
+        #right-sidebar { width: 25%; background: var(--panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; height: 100vh; }
+        #dict-header { background: #1e1e24; color: var(--gold); padding: 20px; font-weight: 900; text-align: center; border-bottom: 2px solid var(--border); font-size: 0.9em; letter-spacing: 1px; }
+        #dict-scroll { flex-grow: 1; overflow-y: auto; padding: 20px; scrollbar-width: thin; scrollbar-color: var(--gold) #111114; }
+        .dict-entry { border-bottom: 1px solid #2d2d33; padding: 18px 0; font-size: 0.78em; color: #cbd5e1; line-height: 1.6; }
+        .dict-entry b { color: var(--accent); display: block; font-size: 1.15em; margin-bottom: 5px; text-transform: uppercase; }
+    </style>
+</head>
+<body onload="init()">
+
+    <div id="left-sidebar">
+        <div id="brand-header">ISRAEL ACCOUNTING PRO</div>
+        <div id="hint-top">💡 KEY HINT: Assets (DR+) and Expenses (DR+) increase on the LEFT. Liabilities, Equity, and Revenue (CR+) increase on the RIGHT. Inventory returns always CREDIT the Inventory asset.</div>
+        <div class="silo-container">
+            <div class="silo-group">
+                <div class="silo-title">1. Assets (DR+)</div>
+                <div class="silo-list">Cash, A/R, Inventory, Supplies, Prepaid Rent, Prepaid Insurance, Land, Buildings, Equipment, Vehicles, Patents, Notes Rec, Interest Rec.</div>
+            </div>
+            <div class="silo-group">
+                <div class="silo-title">2. Liabilities (CR+)</div>
+                <div class="silo-list">A/P, Notes Payable, Unearned Revenue, Salaries Payable, Interest Payable, Dividends Payable, Income Tax Payable, Bonds Payable.</div>
+            </div>
+            <div class="silo-group">
+                <div class="silo-title">3. Equity & Revenue (CR+)</div>
+                <div class="silo-list">Common Stock, Preferred Stock, Retained Earnings, Service Revenue, Sales Revenue.</div>
+            </div>
+            <div class="silo-group">
+                <div class="silo-title">4. Expenses & Contras (DR+)</div>
+                <div class="silo-list">COGS, Salaries Exp, Rent Exp, Utilities Exp, Depr Exp, Ins Exp, Adv Exp, Dividends, Sales Returns.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="center-stage">
+        <div class="work-card">
+            <textarea id="paste-input" rows="3" placeholder="Paste your question here or leave blank to auto-generate..."></textarea>
+            
+            <button onclick="revealMission()" class="btn btn-gen">GENERATE QUESTION & ENTRY SHEET</button>
+
+            <div id="active-workspace" style="display:none;">
+                <div id="mission-display"></div>
+                <table class="journal-grid">
+                    <thead><tr><th>DATE</th><th>ACCOUNT NAME</th><th>DEBIT</th><th>CREDIT</th></tr></thead>
+                    <tbody id="grid-body"></tbody>
+                </table>
+                <button onclick="validate()" class="btn btn-val">VALIDATE ENTRIES</button>
+                <div id="feedback"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="right-sidebar">
+        <div id="dict-header">NEURAL DICTIONARY (32 CONCEPTS)</div>
+        <div id="dict-scroll"></div>
+    </div>
+
+<script>
+    const registry = {
+        "Cash": "Asset: Liquid funds used for all payments. [DR+]",
+        "Accounts Receivable": "Asset: Oral promise of payment from customers. [DR+]",
+        "Inventory": "Asset: Goods held for resale to customers. [DR+]",
+        "Supplies": "Asset: Office/operating items used quickly. [DR+]",
+        "Equipment": "Asset: Long-term machinery or tools. [DR+]",
+        "Land": "Asset: Real estate property. Never depreciates. [DR+]",
+        "Buildings": "Asset: Physical structures used in business. [DR+]",
+        "Prepaid Rent": "Asset: Rent paid in advance for future months. [DR+]",
+        "Prepaid Insurance": "Asset: Insurance premiums paid in advance. [DR+]",
+        "Notes Receivable": "Asset: Formal written promise for payment. [DR+]",
+        "Interest Receivable": "Asset: Interest earned but not yet collected. [DR+]",
+        "Vehicles": "Asset: Trucks, cars, or delivery vans. [DR+]",
+        "Patents": "Asset: Exclusive rights to an invention. [DR+]",
+        "Accum. Depreciation": "Contra-Asset: Total wear-and-tear of assets. [CR+]",
+        "Accounts Payable": "Liability: Money owed to suppliers/vendors. [CR+]",
+        "Notes Payable": "Liability: Formal written debt to a lender. [CR+]",
+        "Unearned Revenue": "Liability: Cash received before service. [CR+]",
+        "Salaries Payable": "Liability: Employee wages owed. [CR+]",
+        "Interest Payable": "Liability: Interest cost owed on debt. [CR+]",
+        "Dividends Payable": "Liability: Declared but unpaid payouts. [CR+]",
+        "Income Tax Payable": "Liability: Taxes owed to the government. [CR+]",
+        "Bonds Payable": "Liability: Long-term debt security. [CR+]",
+        "Common Stock": "Equity: Investment by company owners. [CR+]",
+        "Preferred Stock": "Equity: Stock with priority dividend rights. [CR+]",
+        "Retained Earnings": "Equity: Cumulative undistributed profit. [CR+]",
+        "Dividends": "Contra-Equity: Distributions to owners. [DR+]",
+        "Service Revenue": "Revenue: Earnings from performing tasks. [CR+]",
+        "Sales Revenue": "Revenue: Earnings from selling goods. [CR+]",
+        "Sales Returns": "Contra-Revenue: Reductions for returned goods. [DR+]",
+        "Cost of Goods Sold": "Expense: The cost of inventory sold. [DR+]",
+        "Salaries Expense": "Expense: Cost of employee labor. [DR+]",
+        "Rent Expense": "Expense: Cost of using office/store space. [DR+]",
+        "Utilities Expense": "Expense: Cost of electricity, water, etc. [DR+]",
+        "Depreciation Expense": "Expense: Allocation of asset cost over time. [DR+]",
+        "Insurance Expense": "Expense: Expired portion of insurance. [DR+]",
+        "Advertising Expense": "Expense: Marketing and promotion costs. [DR+]"
+    };
+
+    function init() {
+        const dict = document.getElementById('dict-scroll');
+        const sorted = Object.keys(registry).sort();
+        sorted.forEach(acc => {
+            dict.innerHTML += `<div class="dict-entry"><b>${acc}</b> ${registry[acc]}</div>`;
+        });
+        const grid = document.getElementById('grid-body');
+        for(let i=0; i<12; i++) {
+            grid.innerHTML += `<tr>
+                <td><input type="date"></td>
+                <td><select><option value="">- SELECT -</option>${sorted.map(a=>`<option>${a}</option>`).join('')}</select></td>
+                <td><input type="number" step="any"></td>
+                <td><input type="number" step="any"></td>
+            </tr>`;
+        }
+    }
+
+    function revealMission() {
+        const p = document.getElementById('paste-input').value;
+        const d = document.getElementById('mission-display');
+        const w = document.getElementById('active-workspace');
+        if (p.trim() !== "") {
+            d.innerText = p;
+        } else {
+            const pool = [
+                "JAN 01: Issued $100,000 Common Stock for Cash.\nJAN 05: Purchased $30,000 Equipment; paid $10,000 Cash and $20,000 on Account.\nJAN 12: Returned $2,000 of Inventory for credit.",
+                "FEB 04: Purchased $8,000 of Inventory for Cash.\nFEB 10: Paid $1,200 for Advertising Expense.\nFEB 20: Sold $5,000 services on account."
+            ];
+            d.innerText = pool[Math.floor(Math.random() * pool.length)];
+        }
+        w.style.display = 'block';
+        document.getElementById('feedback').style.display = 'none';
+    }
+
+    function validate() {
+        const fb = document.getElementById('feedback'); fb.style.display = 'block';
+        let drT = 0, crT = 0, dateFail = false;
+        document.querySelectorAll('#grid-body tr').forEach(row => {
+            const dt = row.cells[0].children[0].value;
+            const acc = row.cells[1].children[0].value;
+            const dr = parseFloat(row.cells[2].children[0].value || 0);
+            const cr = parseFloat(row.cells[3].children[0].value || 0);
+
+            if (acc !== "") {
+                drT += dr; crT += cr;
+                if (!dt) dateFail = true;
+            }
+        });
+
+        if (drT === 0) {
+            fb.className = "red"; fb.innerHTML = "ERROR: No accounts recorded. Select an account name to begin.";
+        } else if (Math.abs(drT - crT) > 0.01) {
+            fb.className = "red"; fb.innerHTML = "MATH ERROR: Unbalanced. Your Debits ($" + drT.toFixed(2) + ") do not match your Credits ($" + crT.toFixed(2) + "). Check your Sidebar definitions.";
+        } else if (dateFail) {
+            fb.className = "red"; fb.innerHTML = "ORGANIZATION ERROR: Every active account row must have a specific Date.";
+        } else {
+            fb.className = "green"; fb.innerHTML = "CORRECT: Your journal entries are balanced and organized perfectly.";
+        }
+    }
+</script>
+</body>
+</html>
